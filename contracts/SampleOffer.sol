@@ -21,7 +21,7 @@ Sample Proposal from a Contractor to the DAO.
 Feel free to use as a template for your own proposal.
 */
 
-import "./DAO.sol";
+import "./SuperDAO.sol";
 
 contract SampleOffer {
 
@@ -36,7 +36,7 @@ contract SampleOffer {
     uint paidOut;
 
     uint dateOfSignature;
-    DAO client; // address of DAO
+    SuperDAO client; // address of DAO
 
     bool public promiseValid;
     uint public rewardDivisor;
@@ -82,7 +82,7 @@ contract SampleOffer {
             throw;
         if (!contractor.send(oneTimeCosts))
             throw;
-        client = DAO(msg.sender);
+        client = SuperDAO(msg.sender);
         dateOfSignature = now;
         promiseValid = true;
     }
@@ -118,7 +118,7 @@ contract SampleOffer {
         deploymentReward = _deploymentReward;
     }
 
-    function updateClientAddress(DAO _newClient) callingRestriction {
+    function updateClientAddress(SuperDAO _newClient) callingRestriction {
         client = _newClient;
     }
 
