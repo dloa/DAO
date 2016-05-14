@@ -10,6 +10,128 @@ var PuddingGenerator = require("../generator");
 var PuddingLoader = require("../loader");
 
 // Compile first
+var result = solc.compile(fs.readFileSync("./test/AlexandriaDAO.sol", {encoding: "utf8"}), 1);
+//console.log(result); // => 
+console.log(result.contracts["AlexandriaDAO"].interface); // => 
+var dao_compiled = result.contracts["AlexandriaDAO"];
+var dao_abi = JSON.parse(dao_compiled.interface);
+var dao_binary = dao_compiled.bytecode;
+console.log(result.contracts["AlexandriaDAO_Creator"].interface); // => 
+var creator_compiled = result.contracts["AlexandriaDAO_Creator"];
+var creator_abi = JSON.parse(creator_compiled.interface);
+var creator_binary = creator_compiled.bytecode;
+
+// Setup
+var web3 = new Web3();
+web3.setProvider(TestRPC.provider());
+Pudding.setWeb3(web3);
+
+var tests = function(contract_instantiator) {
+  var contract;
+  var accounts;
+
+  before(function(done) {
+    contract_instantiator(function(err, _contract) {
+      contract = _contract;
+      done(err);
+    });
+  });
+
+  before(function(done) {
+    web3.eth.getAccounts(function(err, accs) {
+      accounts = accs;
+
+      Pudding.defaults({
+        from: accounts[0]
+      });
+
+      done(err);
+    });
+  });
+
+  it("should validate contract deployment", function(done) {
+    var c = contract.at(contract.deployed_address);
+    assert.isTrue(true);
+    done();
+  });
+
+/*
+  it("should validate AlexandriaDAO_Creator deployment", function(done) {
+    var alexandriaDao = AlexandriaDAO_Creator.at(AlexandriaDAO.deployed_address);
+    assert.isTrue(true);
+    done();
+  });
+*/
+};
+
+describe("Contract abstractions", function() {
+
+  describe("when using .whisk()", function() {
+
+    console.log("AlexandriaDAO contract")
+    tests(function(callback) {
+      callback(null, Pudding.whisk({
+        abi: dao_abi,
+        binary: dao_binary,
+        contract_name: "AlexandriaDAO",
+        address: "0xe6e1652a0397e078f434d6dda181b218cfd42e01", // random; meant to check default values
+      }));
+    });
+
+    console.log("AlexandriaDAO_Creator contract")
+    tests(function(callback) {
+      callback(null, Pudding.whisk({
+        abi: creator_abi,
+        binary: creator_binary,
+        contract_name: "AlexandriaDAO_Creator",
+        address: "0xe6e1652a0397e078f434d6dda181b218cfd42e01", // random; meant to check default values
+      }));
+    });
+  });
+
+  describe("when using generator/loader:", function() {
+    tests(function(callback) {
+      var dirPath = temp.mkdirSync('ether-pudding-generator');
+
+      console.log("AlexandriaDAO contract")
+      PuddingGenerator.save({
+        "AlexandriaDAO": {
+          abi: dao_abi,
+          binary: dao_binary,
+          address: "0xe6e1652a0397e078f434d6dda181b218cfd42e01"
+        }
+      }, dirPath, {removeExisting: true});
+
+      var scope = {};
+
+      PuddingLoader.load(dirPath, Pudding, scope, function(err, names) {
+        callback(err, scope["AlexandriaDAO"]);
+      });
+    });
+
+    tests(function(callback) {
+      var dirPath = temp.mkdirSync('ether-pudding-generator');
+
+      console.log("AlexandriaDAO_Creator contract")
+      PuddingGenerator.save({
+        "AlexandriaDAO_Creator": {
+          abi: creator_abi,
+          binary: creator_binary,
+          address: "0xe6e1652a0397e078f434d6dda181b218cfd42e01"
+        }
+      }, dirPath, {removeExisting: true});
+
+      var scope = {};
+
+      PuddingLoader.load(dirPath, Pudding, scope, function(err, names) {
+        callback(err, scope["AlexandriaDAO_Creator"]);
+      });
+    });
+  });
+});
+
+/*
+// Compile first
 var result = solc.compile(fs.readFileSync("./test/Example.sol", {encoding: "utf8"}), 1);
 var compiled = result.contracts["Example"];
 var abi = JSON.parse(compiled.interface);
@@ -154,3 +276,4 @@ describe("Contract abstractions", function() {
   });
 
 });
+*/

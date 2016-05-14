@@ -30,6 +30,9 @@ npm install ether-pudding
 <script type="text/javascript" src="./build/ether-pudding.min.js"></script>
 ```
 
+### Dependencies
+`sudo npm install chai bluebird temp solc ethereumjs-testrpc node-dir web3`
+
 ### Using Pudding: For Beginners
 
 Using Pudding in your app is very similar to using web3’s contract abstraction. So similar that you'll need the same information to get started:
