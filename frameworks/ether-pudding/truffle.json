@@ -1,8 +1,8 @@
 {
   "build": "webpack",
   "deploy": [
-    "Example",
-    "TestWithConstructor"
+    "AlexandriaDAO",
+    "AlexandriaDAO_Creator"
   ],
   "rpc": {
     "host": "localhost",

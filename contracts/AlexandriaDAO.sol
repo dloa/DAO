@@ -687,6 +687,14 @@ contract AlexandriaDAO is AlexandriaDAOInterface, AlexandriaToken, AlexandriaTok
     }
 
 
+    function isOpen() returns (bool) {
+        if (now > closingTime) 
+            return true;
+        else
+            return false; 
+    }
+    
+
     function newProposal(
         address _recipient,
         uint _amount,
